@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product & Seller Details</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="index.html" class="brand">CURATED CATALOG</a>
+  </header>
+
+  <main class="detail-wrapper">
+    <a href="index.html" class="back-link">← Back to Catalog</a>
+    <div id="productDetail"></div>
+  </main>
+
+  <script src="products.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get("id");
+    const product = PRODUCTS.find(p => p.id === productId) || PRODUCTS[0];
+    const container = document.getElementById("productDetail");
+
+    const waMessage = encodeURIComponent(`Hi ${product.seller.name}, I saw "${product.name}" (${product.price}) on your catalog and I'm interested.`);
+
+    container.innerHTML = `
+      <div class="detail-grid">
+        <div class="detail-image">
+          <img src="${product.image}" alt="${product.name}" />
+        </div>
+        <div class="detail-info">
+          <div class="card-category">${product.category}</div>
+          <h1>${product.name}</h1>
+          <div class="detail-price">${product.price}</div>
+          <p class="detail-desc">${product.description}</p>
+
+          <div class="seller-box">
+            <h3>Seller Details</h3>
+            <div class="seller-row"><strong>Seller:</strong> ${product.seller.name}</div>
+            <div class="seller-row"><strong>Location:</strong> ${product.seller.location}</div>
+            <div class="seller-row"><strong>Phone:</strong> ${product.seller.phone}</div>
+
+            <div class="seller-actions">
+              <a class="btn btn-whatsapp" href="https://wa.me/${product.seller.whatsapp}?text=${waMessage}" target="_blank">
+                Chat on WhatsApp
+              </a>
+              <a class="btn btn-call" href="tel:${product.seller.phone}">
+                Call Seller (${product.seller.phone})
+              </a>
+              <button class="btn btn-copy" id="copyBtn" onclick="copyPhone('${product.seller.phone}')">
+                Copy Phone Number
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    function copyPhone(number) {
+      navigator.clipboard.writeText(number).then(() => {
+        const btn = document.getElementById("copyBtn");
+        btn.textContent = "Copied!";
+        setTimeout(() => { btn.textContent = "Copy Phone Number"; }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
