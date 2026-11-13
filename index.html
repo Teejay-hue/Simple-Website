@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catalog — Browse & Contact Sellers</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="index.html" class="brand">CURATED CATALOG</a>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search shoes, styles, or seller location..." />
+    </div>
+  </header>
+
+  <nav class="filters" id="categoryFilters">
+    <button class="filter-btn active" data-category="All">All</button>
+    <button class="filter-btn" data-category="Sneakers">Sneakers</button>
+    <button class="filter-btn" data-category="Loafers">Loafers</button>
+    <button class="filter-btn" data-category="Boots">Boots</button>
+  </nav>
+
+  <main class="masonry-container" id="productFeed"></main>
+
+  <script src="products.js"></script>
+  <script>
+    const feed = document.getElementById("productFeed");
+    const searchInput = document.getElementById("searchInput");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    let currentCategory = "All";
+
+    function renderProducts() {
+      const query = searchInput.value.toLowerCase().trim();
+      const filtered = PRODUCTS.filter(item => {
+        const matchesCat = currentCategory === "All" || item.category === currentCategory;
+        const matchesQuery =
+          item.name.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query) ||
+          item.seller.location.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        feed.innerHTML = `<p style="color: var(--text-muted);">No matching products found.</p>`;
+        return;
+      }
+
+      feed.innerHTML = filtered.map(item => `
+        <a href="product.html?id=${item.id}" class="product-card">
+          <img src="${item.image}" alt="${item.name}" loading="lazy" />
+          <div class="card-body">
+            <div class="card-category">${item.category}</div>
+            <h2 class="card-title">${item.name}</h2>
+            <div class="card-price">${item.price}</div>
+            <div class="card-seller-hint">
+              <span>${item.seller.location}</span>
+              <span>View Seller →</span>
+            </div>
+          </div>
+        </a>
+      `).join("");
+    }
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCategory = btn.dataset.category;
+        renderProducts();
+      });
+    });
+
+    searchInput.addEventListener("input", renderProducts);
+    renderProducts();
+  </script>
+</body>
+</html>
